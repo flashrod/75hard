@@ -4,7 +4,7 @@ const {
   updateTasks,
   getDayHistory
 } = require('../controllers/taskController');
-const auth = require('../middleware/auth');
+const firebaseAuth = require('../middleware/firebaseAuth');
 const { validateTaskUpdate, handleValidationErrors } = require('../middleware/validation');
 
 const router = express.Router();

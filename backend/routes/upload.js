@@ -1,7 +1,7 @@
 const express = require('express');
 const ProgressPhoto = require('../models/ProgressPhoto');
 const ChallengeDay = require('../models/ChallengeDay');
-const auth = require('../middleware/auth');
+const firebaseAuth = require('../middleware/firebaseAuth');
 const { upload, cloudinary } = require('../utils/cloudinary');
 
 const router = express.Router();
