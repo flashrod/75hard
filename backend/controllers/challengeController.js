@@ -5,8 +5,20 @@ const startChallenge = async (req, res) => {
   try {
     const userId = req.user.id;
     
+    // Check if user already has an active challenge
+    const user = await User.findById(userId);
+    
+    if (user.challengeStatus === 'active') {
+      return res.status(200).json({
+        success: true,
+        message: 'Challenge is already active',
+        user,
+        alreadyActive: true
+      });
+    }
+    
     // Update user status
-    const user = await User.findByIdAndUpdate(
+    const updatedUser = await User.findByIdAndUpdate(
       userId,
       {
         challengeStatus: 'active',
@@ -28,7 +40,7 @@ const startChallenge = async (req, res) => {
     res.json({
       success: true,
       message: 'Challenge started successfully!',
-      user,
+      user: updatedUser,
       currentDay: firstDay
     });
   } catch (error) {
@@ -135,4 +147,3 @@ module.exports = {
   completeChallenge,
   getChallengeProgress
 };
-// This code defines the challengeController for managing the 75 Hard Challenge.
