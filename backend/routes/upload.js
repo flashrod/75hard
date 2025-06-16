@@ -1,7 +1,7 @@
 const express = require('express');
 const ProgressPhoto = require('../models/ProgressPhoto');
 const ChallengeDay = require('../models/ChallengeDay');
-const firebaseAuth = require('../middleware/firebaseAuth');
+const firebaseAuth = require('../middleware/firebaseAuth'); // Change this line
 const { upload, cloudinary } = require('../utils/cloudinary');
 
 const router = express.Router();
@@ -9,7 +9,7 @@ const router = express.Router();
 // @route   POST /api/upload/progress-photo
 // @desc    Upload progress photo
 // @access  Private
-router.post('/progress-photo', auth, upload.single('photo'), async (req, res) => {
+router.post('/progress-photo', firebaseAuth, upload.single('photo'), async (req, res) => {
   try {
     if (!req.file) {
       return res.status(400).json({ message: 'No image file provided' });
@@ -80,7 +80,7 @@ router.post('/progress-photo', auth, upload.single('photo'), async (req, res) =>
 // @route   GET /api/upload/progress-photos
 // @desc    Get all progress photos for user
 // @access  Private
-router.get('/progress-photos', auth, async (req, res) => {
+router.get('/progress-photos', firebaseAuth, async (req, res) => {
   try {
     const userId = req.user.id;
     const photos = await ProgressPhoto.find({ userId }).sort({ dayNumber: 1 });
@@ -98,7 +98,7 @@ router.get('/progress-photos', auth, async (req, res) => {
 // @route   DELETE /api/upload/progress-photo/:photoId
 // @desc    Delete progress photo
 // @access  Private
-router.delete('/progress-photo/:photoId', auth, async (req, res) => {
+router.delete('/progress-photo/:photoId', firebaseAuth, async (req, res) => {
   try {
     const { photoId } = req.params;
     const userId = req.user.id;

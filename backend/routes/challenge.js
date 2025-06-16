@@ -1,27 +1,32 @@
 const express = require('express');
 const {
-  getCurrentDay,
-  updateTasks,
-  getDayHistory
-} = require('../controllers/taskController');
+  startChallenge,
+  resetChallenge,
+  completeChallenge,
+  getChallengeProgress
+} = require('../controllers/challengeController');
 const firebaseAuth = require('../middleware/firebaseAuth');
-const { validateTaskUpdate, handleValidationErrors } = require('../middleware/validation');
 
 const router = express.Router();
 
-// @route   GET /api/tasks/current
-// @desc    Get current day tasks
+// @route   POST /api/challenge/start
+// @desc    Start a new 75 Hard challenge
 // @access  Private
-router.get('/current', auth, getCurrentDay);
+router.post('/start', firebaseAuth, startChallenge);
 
-// @route   PUT /api/tasks/update
-// @desc    Update task completion status
+// @route   POST /api/challenge/reset
+// @desc    Reset current challenge to day 1
 // @access  Private
-router.put('/update', auth, validateTaskUpdate, handleValidationErrors, updateTasks);
+router.post('/reset', firebaseAuth, resetChallenge);
 
-// @route   GET /api/tasks/history
-// @desc    Get task history with pagination
+// @route   POST /api/challenge/complete
+// @desc    Mark challenge as completed
 // @access  Private
-router.get('/history', auth, getDayHistory);
+router.post('/complete', firebaseAuth, completeChallenge);
+
+// @route   GET /api/challenge/progress
+// @desc    Get challenge progress and statistics
+// @access  Private
+router.get('/progress', firebaseAuth, getChallengeProgress);
 
 module.exports = router;
