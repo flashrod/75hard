@@ -1,37 +1,68 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
+
 @import "tailwindcss";
 
-/* Custom color variables for your palette */
+
+/* Custom color variables for your new palette */
 :root {
-  --primary-dark: #003135;
-  --primary: #024950;
-  --accent: #0FAA4F;
-  --highlight: #0FAA4F;
-  --copper: #964734;
-  --sky: #AFDDE5;
-  --brand: #0FAA4F;
+  --primary: #6892ef;
+  --secondary: #f0cd3d;
+  --tertiary: #fef2f0;
+  --text: #ffffff;
 }
 
 /* Custom utility classes */
-.bg-primary-dark { background-color: var(--primary-dark); }
 .bg-primary { background-color: var(--primary); }
-.bg-accent { background-color: var(--accent); }
-.bg-copper { background-color: var(--copper); }
-.bg-sky { background-color: var(--sky); }
-.text-primary-dark { color: var(--primary-dark); }
+.bg-secondary { background-color: var(--secondary); }
+.bg-tertiary { background-color: var(--tertiary); }
+.bg-text { background-color: var(--text); }
+
 .text-primary { color: var(--primary); }
-.text-accent { color: var(--accent); }
-.text-copper { color: var(--copper); }
-.text-sky { color: var(--sky); }
-.border-accent { border-color: var(--accent); }
-.border-copper { border-color: var(--copper); }
+.text-secondary { color: var(--secondary); }
+.text-tertiary { color: var(--tertiary); }
+.text-text { color: var(--text); }
+
+.border-primary { border-color: var(--primary); }
+.border-secondary { border-color: var(--secondary); }
+.border-tertiary { border-color: var(--tertiary); }
+.border-text { border-color: var(--text); }
+
+/* Ring colors for focus states */
+.ring-primary { --tw-ring-color: var(--primary); }
+.ring-secondary { --tw-ring-color: var(--secondary); }
+
+/* Hover variants */
+.hover\:bg-primary:hover { background-color: var(--primary); }
+.hover\:bg-secondary:hover { background-color: var(--secondary); }
+.hover\:text-primary:hover { color: var(--primary); }
+.hover\:text-secondary:hover { color: var(--secondary); }
 
 /* Custom fonts */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
 
 body {
   font-family: 'Inter', sans-serif;
+  background-color: var(--primary);
+  color: var(--text);
 }
 
 .font-display {
   font-family: 'Montserrat', sans-serif;
+}
+
+/* Additional utility classes for gradients */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
+}
+
+/* Custom shadows with your colors */
+.shadow-primary {
+  box-shadow: 0 10px 25px rgba(104, 146, 239, 0.3);
+}
+
+.shadow-secondary {
+  box-shadow: 0 10px 25px rgba(240, 205, 61, 0.3);
 }
