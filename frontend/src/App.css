@@ -1,0 +1,37 @@
+@import "tailwindcss";
+
+/* Custom color variables for your palette */
+:root {
+  --primary-dark: #003135;
+  --primary: #024950;
+  --accent: #0FAA4F;
+  --highlight: #0FAA4F;
+  --copper: #964734;
+  --sky: #AFDDE5;
+  --brand: #0FAA4F;
+}
+
+/* Custom utility classes */
+.bg-primary-dark { background-color: var(--primary-dark); }
+.bg-primary { background-color: var(--primary); }
+.bg-accent { background-color: var(--accent); }
+.bg-copper { background-color: var(--copper); }
+.bg-sky { background-color: var(--sky); }
+.text-primary-dark { color: var(--primary-dark); }
+.text-primary { color: var(--primary); }
+.text-accent { color: var(--accent); }
+.text-copper { color: var(--copper); }
+.text-sky { color: var(--sky); }
+.border-accent { border-color: var(--accent); }
+.border-copper { border-color: var(--copper); }
+
+/* Custom fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+.font-display {
+  font-family: 'Montserrat', sans-serif;
+}

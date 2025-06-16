@@ -1,19 +1,20 @@
-// src/App.jsx
-import Navbar from "./components/NavBar";
-import Landing from "./components/Landing";
-import Features from "./components/Features";
-import Footer from "./components/Footer";
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import Dashboard from './pages/Dashboard';
+import './App.css';
 
 function App() {
   return (
-    <div className="font-sans bg-primaryDark min-h-screen">
-      <Navbar />
-      <main>
-        <Landing />
-        <Features />
-      </main>
-      <Footer />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/register" element={<Register />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
 
