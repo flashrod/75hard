@@ -9,6 +9,11 @@ export default function Dashboard() {
   const { backendUser, getAuthHeaders } = useAuth();
   const [currentDay, setCurrentDay] = useState(null);
   const [challengeStatus, setChallengeStatus] = useState('not_started');
+  const [userStats, setUserStats] = useState({
+    currentChallengeDay: 0,
+    totalResets: 0,
+    completedChallenges: 0
+  });
   const [tasks, setTasks] = useState({
     workout1: { completed: false, duration: 0, notes: "" },
     workout2: { completed: false, duration: 0, notes: "" },
@@ -18,11 +23,14 @@ export default function Dashboard() {
     progressPhoto: { completed: false }
   });
   const [loading, setLoading] = useState(true);
+  const [startingChallenge, setStartingChallenge] = useState(false);
   const [error, setError] = useState("");
 
   // Fetch current day and progress data
   useEffect(() => {
     const fetchData = async () => {
+      if (!backendUser || startingChallenge) return; // Prevent fetch during challenge start
+      
       try {
         setLoading(true);
         setError("");
@@ -32,7 +40,16 @@ export default function Dashboard() {
         const currentDayResponse = await apiService.getCurrentDay(headers);
         console.log('📊 Current day response:', currentDayResponse);
         
+        // Update all state from response
         setChallengeStatus(currentDayResponse.challengeStatus || 'not_started');
+        
+        if (currentDayResponse.user) {
+          setUserStats({
+            currentChallengeDay: currentDayResponse.user.currentChallengeDay || 0,
+            totalResets: currentDayResponse.user.totalResets || 0,
+            completedChallenges: currentDayResponse.user.completedChallenges || 0
+          });
+        }
         
         if (currentDayResponse.currentDay) {
           setCurrentDay(currentDayResponse.currentDay);
@@ -49,26 +66,59 @@ export default function Dashboard() {
       }
     };
 
-    if (backendUser) {
-      fetchData();
-    }
-  }, [backendUser, getAuthHeaders]);
+    fetchData();
+  }, [backendUser, getAuthHeaders, startingChallenge]); // Added startingChallenge dependency
 
-  // Handle starting the challenge
+  // Handle starting the challenge - FIXED: No more reload
   const handleStartChallenge = async () => {
+    if (startingChallenge) return; // Prevent multiple clicks
+    
     try {
-      setLoading(true);
+      setStartingChallenge(true);
+      setError("");
+      
       const headers = await getAuthHeaders();
       const response = await apiService.startChallenge(headers);
       console.log('✅ Challenge started:', response);
       
-      // Refresh data after starting challenge
-      window.location.reload();
+      // Update state directly instead of reloading
+      setChallengeStatus('active');
+      setUserStats(prev => ({
+        ...prev,
+        currentChallengeDay: 1
+      }));
+      
+      // Create initial day tasks
+      const initialTasks = {
+        workout1: { completed: false, duration: 0, notes: "" },
+        workout2: { completed: false, duration: 0, notes: "" },
+        waterIntake: { completed: false, amount: 0 },
+        dietCompliance: { completed: false, notes: "" },
+        reading: { completed: false, pages: 0, bookTitle: "" },
+        progressPhoto: { completed: false }
+      };
+      setTasks(initialTasks);
+      
+      // Fetch fresh data after starting
+      setTimeout(async () => {
+        try {
+          const headers = await getAuthHeaders();
+          const currentDayResponse = await apiService.getCurrentDay(headers);
+          
+          if (currentDayResponse.currentDay) {
+            setCurrentDay(currentDayResponse.currentDay);
+            setTasks(currentDayResponse.currentDay.tasks || initialTasks);
+          }
+        } catch (error) {
+          console.error('❌ Error fetching after start:', error);
+        }
+      }, 500);
+      
     } catch (error) {
       console.error('❌ Start challenge error:', error);
       setError(error.message);
     } finally {
-      setLoading(false);
+      setStartingChallenge(false);
     }
   };
 
@@ -89,12 +139,13 @@ export default function Dashboard() {
         }
       };
 
+      // Optimistic update
       setTasks(updatedTasks);
 
       // Update backend
       const headers = await getAuthHeaders();
       await apiService.updateTasks({
-        dayNumber: backendUser.currentChallengeDay || 1,
+        dayNumber: userStats.currentChallengeDay || 1,
         tasks: updatedTasks
       }, headers);
 
@@ -107,7 +158,7 @@ export default function Dashboard() {
     }
   };
 
-  if (loading) {
+  if (loading && !startingChallenge) {
     return (
       <div className="min-h-screen bg-primary flex items-center justify-center">
         <div className="bg-tertiary rounded-2xl p-8 flex flex-col items-center">
@@ -163,11 +214,18 @@ export default function Dashboard() {
 
             <motion.button
               onClick={handleStartChallenge}
-              disabled={loading}
-              whileHover={{ scale: loading ? 1 : 1.05 }}
-              className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg disabled:opacity-50"
+              disabled={startingChallenge}
+              whileHover={{ scale: startingChallenge ? 1 : 1.05 }}
+              className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Starting...' : 'Start Challenge'}
+              {startingChallenge ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  Starting...
+                </div>
+              ) : (
+                'Start Challenge'
+              )}
             </motion.button>
           </motion.div>
         </main>
@@ -195,10 +253,11 @@ export default function Dashboard() {
             </p>
             <motion.button
               onClick={handleStartChallenge}
-              whileHover={{ scale: 1.05 }}
-              className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg"
+              disabled={startingChallenge}
+              whileHover={{ scale: startingChallenge ? 1 : 1.05 }}
+              className="bg-secondary text-primary font-bold py-3 px-8 rounded-lg disabled:opacity-50"
             >
-              Start New Challenge
+              {startingChallenge ? 'Starting...' : 'Start New Challenge'}
             </motion.button>
           </motion.div>
         </main>
@@ -239,7 +298,7 @@ export default function Dashboard() {
             className="bg-tertiary rounded-xl p-6 text-center"
           >
             <div className="text-3xl font-bold text-secondary">
-              {backendUser.currentChallengeDay || 1}
+              {userStats.currentChallengeDay}
             </div>
             <div className="text-primary">Current Day</div>
           </motion.div>
@@ -261,7 +320,7 @@ export default function Dashboard() {
             className="bg-tertiary rounded-xl p-6 text-center"
           >
             <div className="text-3xl font-bold text-secondary">
-              {backendUser.totalResets || 0}
+              {userStats.totalResets}
             </div>
             <div className="text-primary">Total Resets</div>
           </motion.div>
@@ -275,7 +334,7 @@ export default function Dashboard() {
           className="bg-tertiary rounded-xl p-8 mb-8"
         >
           <h2 className="text-2xl font-display font-bold text-primary mb-6 text-center">
-            Day {backendUser.currentChallengeDay || 1} Tasks
+            Day {userStats.currentChallengeDay} Tasks
           </h2>
 
           {/* Progress Bar */}
