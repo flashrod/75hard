@@ -66,3 +66,35 @@ body {
 .shadow-secondary {
   box-shadow: 0 10px 25px rgba(240, 205, 61, 0.3);
 }
+
+/* GitHub Calendar Custom Styles */
+.react-activity-calendar {
+  width: 100% !important;
+}
+
+.react-activity-calendar .react-activity-calendar__calendar {
+  font-family: 'Inter', sans-serif !important;
+}
+
+.react-activity-calendar .react-activity-calendar__legend {
+  font-size: 12px !important;
+  color: var(--primary) !important;
+}
+
+.react-activity-calendar .react-activity-calendar__month {
+  font-size: 12px !important;
+  color: var(--primary) !important;
+}
+
+.react-activity-calendar .react-activity-calendar__weekday {
+  font-size: 10px !important;
+  color: var(--primary) !important;
+}
+
+/* Responsive calendar */
+@media (max-width: 768px) {
+  .react-activity-calendar {
+    transform: scale(0.8);
+    transform-origin: center;
+  }
+}

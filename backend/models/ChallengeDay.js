@@ -55,6 +55,10 @@ const challengeDaySchema = new mongoose.Schema({
     type: Boolean,
     default: false
   },
+  dayCompleted: {
+    type: Boolean,
+    default: false
+  },
   completedAt: {
     type: Date
   },
@@ -76,10 +80,6 @@ challengeDaySchema.pre('save', function(next) {
     tasks.dietCompliance.completed &&
     tasks.reading.completed &&
     tasks.progressPhoto.completed;
-  
-  if (this.allTasksCompleted && !this.completedAt) {
-    this.completedAt = new Date();
-  }
   
   next();
 });

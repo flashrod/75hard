@@ -13,7 +13,7 @@ class ApiService {
         'Content-Type': 'application/json',
         ...options.headers,
       },
-      credentials: 'include', // Important for CORS with credentials
+      credentials: 'include',
       ...options,
     };
 
@@ -42,40 +42,9 @@ class ApiService {
     });
   }
 
-  // Get user profile from backend
-  async getUserProfile(authHeaders) {
-    return this.request('/auth/profile', {
-      method: 'GET',
-      headers: authHeaders,
-    });
-  }
-
-  // Update user profile
-  async updateUserProfile(profileData, authHeaders) {
-    return this.request('/auth/profile', {
-      method: 'PUT',
-      headers: authHeaders,
-      body: JSON.stringify(profileData),
-    });
-  }
-
   // Challenge related endpoints
   async startChallenge(authHeaders) {
     return this.request('/challenge/start', {
-      method: 'POST',
-      headers: authHeaders,
-    });
-  }
-
-  async resetChallenge(authHeaders) {
-    return this.request('/challenge/reset', {
-      method: 'POST',
-      headers: authHeaders,
-    });
-  }
-
-  async completeChallenge(authHeaders) {
-    return this.request('/challenge/complete', {
       method: 'POST',
       headers: authHeaders,
     });
@@ -104,7 +73,15 @@ class ApiService {
     });
   }
 
-  async getDayHistory(authHeaders, page = 1, limit = 10) {
+  async completeDay(dayNumber, authHeaders) {
+    return this.request('/tasks/complete-day', {
+      method: 'POST',
+      headers: authHeaders,
+      body: JSON.stringify({ dayNumber }),
+    });
+  }
+
+  async getDayHistory(authHeaders, page = 1, limit = 100) {
     return this.request(`/tasks/history?page=${page}&limit=${limit}`, {
       method: 'GET',
       headers: authHeaders,
@@ -113,14 +90,13 @@ class ApiService {
 
   // Photo upload endpoints
   async uploadProgressPhoto(formData, authHeaders) {
-    // Remove Content-Type header for FormData - let browser set it
     const headers = { ...authHeaders };
     delete headers['Content-Type'];
 
     return this.request('/upload/progress-photo', {
       method: 'POST',
       headers: headers,
-      body: formData, // FormData object
+      body: formData,
     });
   }
 
@@ -138,7 +114,6 @@ class ApiService {
     });
   }
 
-  // Utility methods
   async healthCheck() {
     return this.request('/health', {
       method: 'GET',
