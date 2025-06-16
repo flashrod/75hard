@@ -1,20 +1,26 @@
 class ApiService {
   constructor() {
-    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api';
+    this.baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5001/api';
+    console.log('🔧 API Service initialized with baseURL:', this.baseURL);
   }
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    console.log(`📡 Making ${options.method || 'GET'} request to:`, url);
+    
     const config = {
       headers: {
         'Content-Type': 'application/json',
         ...options.headers,
       },
+      credentials: 'include', // Important for CORS with credentials
       ...options,
     };
 
     try {
       const response = await fetch(url, config);
+      console.log(`📡 Response status: ${response.status} for ${url}`);
+      
       const data = await response.json();
       
       if (!response.ok) {
@@ -23,6 +29,7 @@ class ApiService {
       
       return data;
     } catch (error) {
+      console.error(`❌ API Error for ${url}:`, error);
       throw error;
     }
   }
@@ -136,21 +143,6 @@ class ApiService {
     return this.request('/health', {
       method: 'GET',
     });
-  }
-
-  // Error handling helper
-  handleApiError(error) {
-    console.error('API Error:', error);
-    
-    if (error.message.includes('Failed to fetch')) {
-      throw new Error('Unable to connect to server. Please check your internet connection.');
-    }
-    
-    if (error.message.includes('401')) {
-      throw new Error('Authentication failed. Please log in again.');
-    }
-    
-    throw error;
   }
 }
 

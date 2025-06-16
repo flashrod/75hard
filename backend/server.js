@@ -13,7 +13,7 @@ const taskRoutes = require('./routes/tasks');
 const uploadRoutes = require('./routes/upload');
 
 const app = express();
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5001;
 
 // Connect to MongoDB
 connectDB();
@@ -25,17 +25,45 @@ const limiter = rateLimit({
   message: 'Too many requests from this IP, please try again later.'
 });
 
+// CORS Configuration - FIXED to include localhost:3000
+const corsOptions = {
+  origin: [
+    'http://localhost:3000',  // Your frontend is running on this port
+    'http://localhost:5173',  // Vite alternative port
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5173',
+    'http://localhost:4173',  // Vite preview port
+    'http://127.0.0.1:4173'
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin'
+  ],
+  optionsSuccessStatus: 200 // Some legacy browsers (IE11, various SmartTVs) choke on 204
+};
+
 // Middleware
 app.use(limiter);
-app.use(helmet());
-app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? 'https://your-frontend-domain.com' 
-    : 'http://localhost:3000',
-  credentials: true
+app.use(helmet({
+  crossOriginEmbedderPolicy: false // Disable COEP for development
 }));
+app.use(cors(corsOptions)); // Updated CORS configuration
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Add preflight handling for all routes
+app.options('*', cors(corsOptions));
+
+// Add logging middleware to debug CORS
+app.use((req, res, next) => {
+  console.log(`📡 ${req.method} ${req.path} - Origin: ${req.get('Origin') || 'none'}`);
+  next();
+});
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -48,26 +76,11 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({ 
     message: '75 Hard Challenge Backend Server Running',
     timestamp: new Date().toISOString(),
-    environment: process.env.NODE_ENV
+    environment: process.env.NODE_ENV,
+    port: PORT,
+    corsOrigins: corsOptions.origin
   });
 });
-
-app.use((req, res, next) => {
-  try {
-    next();
-  } catch (error) {
-    if (error instanceof TypeError && error.message.includes('Missing parameter name')) {
-      console.error('⚠️ Route parameter error:', error.message);
-      res.status(400).json({ 
-        message: 'Invalid route configuration',
-        error: process.env.NODE_ENV === 'development' ? error.message : {}
-      });
-    } else {
-      next(error);
-    }
-  }
-});
-
 
 // Error handling middleware
 app.use((err, req, res, next) => {
@@ -84,12 +97,29 @@ app.all('*', (req, res) => {
   res.status(404).json({ message: 'Route not found' });
 });
 
-app.listen(PORT, () => {
+// Enhanced server startup with port conflict handling
+const server = app.listen(PORT, () => {
   console.log('🎉 75 Hard Challenge Backend Server Started!');
   console.log(`🌐 Server running on port ${PORT}`);
   console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`📅 Started at: ${new Date().toISOString()}`);
+  console.log(`🌍 CORS enabled for origins: ${corsOptions.origin.join(', ')}`);
   console.log('─'.repeat(50));
 });
 
-module.exports = app;
+// Handle port already in use error
+server.on('error', (err) => {
+  if (err.code === 'EADDRINUSE') {
+    console.error(`❌ Port ${PORT} is already in use!`);
+    console.log('🔧 Solutions:');
+    console.log(`   1. Kill the process: sudo kill -9 $(lsof -ti:${PORT})`);
+    console.log(`   2. Use a different port in your .env file`);
+    console.log(`   3. Wait a moment and try again`);
+    process.exit(1);
+  } else {
+    console.error('🚨 Server error:', err);
+    process.exit(1);
+  }
+});
+
+// Graceful shutdown

@@ -6,8 +6,19 @@ const getCurrentDay = async (req, res) => {
     const userId = req.user.id;
     const user = await User.findById(userId);
     
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if user has an active challenge
     if (user.challengeStatus !== 'active') {
-      return res.status(400).json({ message: 'No active challenge found' });
+      return res.status(200).json({
+        success: true,
+        message: 'No active challenge',
+        currentDay: null,
+        user: user,
+        challengeStatus: user.challengeStatus
+      });
     }
 
     let currentDay = await ChallengeDay.findOne({
@@ -27,7 +38,9 @@ const getCurrentDay = async (req, res) => {
 
     res.json({
       success: true,
-      currentDay
+      currentDay,
+      user: user,
+      challengeStatus: user.challengeStatus
     });
   } catch (error) {
     console.error('Get current day error:', error);
@@ -39,6 +52,12 @@ const updateTasks = async (req, res) => {
   try {
     const { dayNumber, tasks } = req.body;
     const userId = req.user.id;
+
+    const user = await User.findById(userId);
+    
+    if (user.challengeStatus !== 'active') {
+      return res.status(400).json({ message: 'No active challenge found' });
+    }
 
     let challengeDay = await ChallengeDay.findOne({ userId, dayNumber });
     
@@ -112,3 +131,4 @@ module.exports = {
   updateTasks,
   getDayHistory
 };
+// This code defines the taskController for managing challenge days and tasks in the 75 Hard Challenge application.

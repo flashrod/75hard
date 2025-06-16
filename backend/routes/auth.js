@@ -10,19 +10,23 @@ const router = express.Router();
 // @access  Public
 router.post('/verify-token', async (req, res) => {
   try {
+    console.log('🔄 Verifying Firebase token...');
     const { idToken } = req.body;
     
     if (!idToken) {
+      console.log('❌ No ID token provided');
       return res.status(400).json({ message: 'ID token is required' });
     }
 
     // Verify the Firebase token
     const decodedToken = await auth.verifyIdToken(idToken);
+    console.log('✅ Firebase token verified for user:', decodedToken.email);
     
     // Find or create user
     let user = await User.findOne({ firebaseUid: decodedToken.uid });
     
     if (!user) {
+      console.log('🔄 Creating new user in database...');
       user = new User({
         firebaseUid: decodedToken.uid,
         name: decodedToken.name || 'User',
@@ -30,6 +34,9 @@ router.post('/verify-token', async (req, res) => {
         profileInfo: {}
       });
       await user.save();
+      console.log('✅ New user created in database');
+    } else {
+      console.log('✅ Existing user found in database');
     }
 
     res.json({
@@ -38,7 +45,7 @@ router.post('/verify-token', async (req, res) => {
       user
     });
   } catch (error) {
-    console.error('Token verification error:', error);
+    console.error('❌ Token verification error:', error);
     res.status(401).json({ message: 'Invalid token' });
   }
 });

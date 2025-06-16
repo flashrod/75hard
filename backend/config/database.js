@@ -4,10 +4,8 @@ const connectDB = async () => {
   try {
     console.log('🔄 Attempting to connect to MongoDB...');
     
-    const conn = await mongoose.connect(process.env.MONGODB_URI, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+    // Removed deprecated options
+    const conn = await mongoose.connect(process.env.MONGODB_URI);
 
     console.log(`✅ MongoDB Connected Successfully!`);
     console.log(`📍 Host: ${conn.connection.host}`);
