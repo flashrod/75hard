@@ -1,32 +1,139 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import { useAuth } from "../contexts/AuthContext";
+import apiService from "../services/api";
 
 export default function Dashboard() {
-  const [currentDay, setCurrentDay] = useState(1);
+  const { backendUser, getAuthHeaders } = useAuth();
+  const [currentDay, setCurrentDay] = useState(null);
+  const [challengeProgress, setChallengeProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
   const [tasks, setTasks] = useState({
-    workout1: false,
-    workout2: false,
-    waterIntake: false,
-    dietCompliance: false,
-    reading: false,
-    progressPhoto: false
+    workout1: { completed: false, duration: 0, notes: "" },
+    workout2: { completed: false, duration: 0, notes: "" },
+    waterIntake: { completed: false, amount: 0 },
+    dietCompliance: { completed: false, notes: "" },
+    reading: { completed: false, pages: 0, bookTitle: "" },
+    progressPhoto: { completed: false }
   });
 
-  const [user] = useState({
-    name: "John Doe",
-    challengeStatus: "active",
-    totalResets: 0,
-    completedChallenges: 0
-  });
+  // Fetch current day and progress data
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const headers = await getAuthHeaders();
+        
+        // Fetch current day
+        const currentDayResponse = await apiService.getCurrentDay(headers);
+        setCurrentDay(currentDayResponse.currentDay);
+        
+        if (currentDayResponse.currentDay) {
+          setTasks(currentDayResponse.currentDay.tasks);
+        }
 
-  const handleTaskToggle = (taskName) => {
-    setTasks(prev => ({
-      ...prev,
-      [taskName]: !prev[taskName]
-    }));
+        // Fetch challenge progress
+        const progressResponse = await apiService.getChallengeProgress(headers);
+        setChallengeProgress(progressResponse.progress);
+        
+      } catch (error) {
+        setError(error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (backendUser) {
+      fetchData();
+    }
+  }, [backendUser, getAuthHeaders]);
+
+  // Handle task updates
+  const handleTaskToggle = async (taskName, taskData = {}) => {
+    try {
+      const updatedTasks = {
+        ...tasks,
+        [taskName]: {
+          ...tasks[taskName],
+          completed: !tasks[taskName].completed,
+          ...taskData
+        }
+      };
+
+      setTasks(updatedTasks);
+
+      // Update backend
+      const headers = await getAuthHeaders();
+      await apiService.updateTasks({
+        dayNumber: backendUser.currentChallengeDay,
+        tasks: updatedTasks
+      }, headers);
+
+    } catch (error) {
+      setError(error.message);
+      // Revert optimistic update
+      setTasks(tasks);
+    }
   };
 
-  const completedTasks = Object.values(tasks).filter(Boolean).length;
+  // Start challenge
+  const handleStartChallenge = async () => {
+    try {
+      const headers = await getAuthHeaders();
+      await apiService.startChallenge(headers);
+      
+      // Refresh data
+      window.location.reload();
+    } catch (error) {
+      setError(error.message);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-sky flex items-center justify-center">
+        <div className="text-white text-xl">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!backendUser) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-sky flex items-center justify-center">
+        <div className="text-white text-xl">Please log in to continue</div>
+      </div>
+    );
+  }
+
+  // If user hasn't started challenge yet
+  if (backendUser.challengeStatus === 'not_started') {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-primary-dark via-primary to-sky flex items-center justify-center">
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-white/10 backdrop-blur-lg rounded-2xl p-8 text-center"
+        >
+          <h1 className="text-3xl font-display font-bold text-white mb-4">
+            Ready to Start Your 75 Hard Journey?
+          </h1>
+          <p className="text-sky mb-6">
+            Transform your life in 75 days with daily challenges that build mental toughness.
+          </p>
+          <motion.button
+            onClick={handleStartChallenge}
+            whileHover={{ scale: 1.05 }}
+            className="bg-accent hover:bg-accent/90 text-white font-bold py-3 px-8 rounded-lg"
+          >
+            Start Challenge
+          </motion.button>
+        </motion.div>
+      </div>
+    );
+  }
+
+  const completedTasks = Object.values(tasks).filter(task => task.completed).length;
   const progressPercentage = (completedTasks / 6) * 100;
 
   const taskItems = [
@@ -51,10 +158,19 @@ export default function Dashboard() {
             75HARD Dashboard
           </motion.h1>
           <div className="text-sky">
-            Welcome back, <span className="text-accent font-semibold">{user.name}</span>
+            Welcome back, <span className="text-accent font-semibold">{backendUser.name}</span>
           </div>
         </div>
       </div>
+
+      {/* Error Message */}
+      {error && (
+        <div className="max-w-6xl mx-auto px-6 pt-4">
+          <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-red-200">
+            {error}
+          </div>
+        </div>
+      )}
 
       <div className="max-w-6xl mx-auto px-6 py-8">
         {/* Stats Cards */}
@@ -65,7 +181,7 @@ export default function Dashboard() {
             transition={{ delay: 0.1 }}
             className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
           >
-            <div className="text-3xl font-bold text-accent">{currentDay}</div>
+            <div className="text-3xl font-bold text-accent">{backendUser.currentChallengeDay}</div>
             <div className="text-sky">Current Day</div>
           </motion.div>
 
@@ -85,7 +201,7 @@ export default function Dashboard() {
             transition={{ delay: 0.3 }}
             className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
           >
-            <div className="text-3xl font-bold text-white">{user.totalResets}</div>
+            <div className="text-3xl font-bold text-white">{backendUser.totalResets}</div>
             <div className="text-sky">Total Resets</div>
           </motion.div>
 
@@ -95,7 +211,7 @@ export default function Dashboard() {
             transition={{ delay: 0.4 }}
             className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
           >
-            <div className="text-3xl font-bold text-accent">{user.completedChallenges}</div>
+            <div className="text-3xl font-bold text-accent">{backendUser.completedChallenges}</div>
             <div className="text-sky">Completed</div>
           </motion.div>
         </div>
@@ -109,7 +225,7 @@ export default function Dashboard() {
             className="bg-white/10 backdrop-blur-lg rounded-xl p-6 border border-white/20"
           >
             <h2 className="text-2xl font-display font-bold text-white mb-6">
-              Day {currentDay} Tasks
+              Day {backendUser.currentChallengeDay} Tasks
             </h2>
 
             {/* Progress Bar */}
@@ -137,7 +253,7 @@ export default function Dashboard() {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: 0.6 + index * 0.1 }}
                   className={`flex items-center justify-between p-4 rounded-lg border transition-all cursor-pointer ${
-                    tasks[item.key]
+                    tasks[item.key]?.completed
                       ? 'bg-accent/20 border-accent text-white'
                       : 'bg-white/5 border-white/20 text-sky hover:bg-white/10'
                   }`}
@@ -148,34 +264,16 @@ export default function Dashboard() {
                     <span className="font-medium">{item.label}</span>
                   </div>
                   <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
-                    tasks[item.key] ? 'bg-accent border-accent' : 'border-white/40'
+                    tasks[item.key]?.completed ? 'bg-accent border-accent' : 'border-white/40'
                   }`}>
-                    {tasks[item.key] && <span className="text-white text-sm">✓</span>}
+                    {tasks[item.key]?.completed && <span className="text-white text-sm">✓</span>}
                   </div>
                 </motion.div>
               ))}
             </div>
-
-            {/* Action Buttons */}
-            <div className="flex gap-4 mt-6">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 bg-accent hover:bg-accent/90 text-white font-bold py-3 px-4 rounded-lg transition-all"
-              >
-                Complete Day
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 bg-copper hover:bg-copper/90 text-white font-bold py-3 px-4 rounded-lg transition-all"
-              >
-                Reset Challenge
-              </motion.button>
-            </div>
           </motion.div>
 
-          {/* Progress Calendar/Chart */}
+          {/* Challenge Progress */}
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
@@ -195,9 +293,9 @@ export default function Dashboard() {
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ delay: 0.8 + (day * 0.01) }}
                   className={`w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold ${
-                    day < currentDay
+                    day < backendUser.currentChallengeDay
                       ? 'bg-accent text-white'
-                      : day === currentDay
+                      : day === backendUser.currentChallengeDay
                       ? 'bg-copper text-white ring-2 ring-white'
                       : 'bg-white/20 text-sky'
                   }`}
@@ -227,3 +325,4 @@ export default function Dashboard() {
     </div>
   );
 }
+// This code is a React component for a user dashboard in a 75 Hard challenge application.
