@@ -1,74 +1,46 @@
-import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 
 export default function Navbar() {
-  const { currentUser, backendUser, logout } = useAuth();
+  const { currentUser, logout } = useAuth();
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-    } catch (error) {
-      console.error("Failed to log out", error);
-    }
-  };
-
-  const navLinks = currentUser 
-    ? [
-        { name: "Home", href: "/" },
-        { name: "Dashboard", href: "/dashboard" },
-      ]
-    : [
-        { name: "Home", href: "/" },
-        { name: "Sign In", href: "/auth" },
-      ];
+  const navLinks = [
+    { name: "Home", href: "/" },
+    { name: "Dashboard", href: "/dashboard" },
+  ];
 
   return (
-    <motion.nav
-      initial={{ y: -80, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}
-      className="w-full z-50 fixed top-0 left-0 bg-primary-dark bg-opacity-80 backdrop-blur-lg shadow-xl"
-    >
+    <nav className="bg-primary w-full fixed top-0 left-0 z-50 shadow-lg">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
-        <motion.div
-          whileHover={{ scale: 1.05 }}
-          className="flex items-center gap-2"
-        >
-          <Link to="/" className="text-copper font-display text-2xl font-bold tracking-widest">
-            75HARD
-          </Link>
-        </motion.div>
-        
+        <Link to="/" className="font-display text-2xl font-bold text-secondary tracking-widest">
+          75HARD
+        </Link>
         <div className="flex items-center gap-8">
           {navLinks.map(link => (
-            <motion.div key={link.name}>
-              <Link
-                to={link.href}
-                className="font-sans text-lg text-sky hover:text-accent transition-all"
-              >
-                {link.name}
-              </Link>
-            </motion.div>
+            <Link
+              key={link.name}
+              to={link.href}
+              className="text-white font-semibold hover:text-secondary transition"
+            >
+              {link.name}
+            </Link>
           ))}
-          
-          {currentUser && (
-            <>
-              <div className="text-sky text-sm">
-                Day {backendUser?.currentChallengeDay || 0}
-              </div>
-              <motion.button
-                onClick={handleLogout}
-                whileHover={{ scale: 1.05 }}
-                className="font-sans text-lg text-sky hover:text-accent transition-all"
-              >
-                Logout
-              </motion.button>
-            </>
+          {currentUser ? (
+            <button
+              onClick={logout}
+              className="text-white font-semibold hover:text-secondary transition"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link to="/auth" className="bg-secondary text-primary font-bold px-4 py-2 rounded-lg shadow hover:bg-primary hover:text-secondary transition">
+              Sign In
+            </Link>
           )}
         </div>
       </div>
-    </motion.nav>
+    </nav>
   );
 }
-// This code defines a responsive navigation bar using React and Framer Motion for animations.
+// This code defines a responsive navigation bar for a web application using React and Framer Motion.
