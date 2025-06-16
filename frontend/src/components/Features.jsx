@@ -1,36 +1,31 @@
-// src/components/Features.jsx
 import { motion } from "framer-motion";
+
 const features = [
   {
-    title: "Daily Progress",
-    desc: "Track every workout, meal, and milestone with ease.",
-    icon: "📈",
+    title: "Track Progress",
+    desc: "Check off each task daily and visualize your streak.",
+    icon: "✅",
   },
   {
     title: "Photo Journal",
-    desc: "Upload daily progress photos and see your transformation.",
-    icon: "📷",
+    desc: "Upload a daily progress photo and see your transformation.",
+    icon: "📸",
   },
   {
-    title: "Community",
-    desc: "Stay motivated with leaderboards and support.",
-    icon: "🤝",
-  },
-  {
-    title: "Reminders",
-    desc: "Never miss a task with smart notifications.",
-    icon: "⏰",
+    title: "Stay Motivated",
+    desc: "See stats, get reminders, and never miss a day.",
+    icon: "🔥",
   },
 ];
 
 export default function Features() {
   return (
-    <section className="bg-primary py-20">
-      <div className="max-w-6xl mx-auto px-4">
-        <h2 className="text-4xl font-display font-bold text-white text-center mb-12">
-          Why <span className="text-highlight">75 Hard</span>?
+    <section className="bg-tertiary py-16">
+      <div className="max-w-4xl mx-auto px-4">
+        <h2 className="text-3xl md:text-4xl font-display font-bold text-primary text-center mb-10">
+          Why <span className="text-secondary">75 Hard?</span>
         </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        <div className="grid md:grid-cols-3 gap-8">
           {features.map((f, i) => (
             <motion.div
               key={f.title}
@@ -38,13 +33,11 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 + i * 0.1, duration: 0.7, type: "spring" }}
               viewport={{ once: true }}
-              className="bg-sky/10 border-l-4 border-highlight rounded-xl shadow-lg p-8 flex items-center gap-6"
+              className="bg-white rounded-xl shadow-lg p-8 flex flex-col items-center"
             >
-              <span className="text-4xl">{f.icon}</span>
-              <div>
-                <h3 className="text-2xl text-highlight font-bold">{f.title}</h3>
-                <p className="text-white/80 mt-2">{f.desc}</p>
-              </div>
+              <span className="text-4xl mb-4">{f.icon}</span>
+              <h3 className="text-xl font-bold text-primary mb-2">{f.title}</h3>
+              <p className="text-primary text-center">{f.desc}</p>
             </motion.div>
           ))}
         </div>
