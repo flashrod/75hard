@@ -54,20 +54,25 @@ app.get('/api/health', (req, res) => {
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
+  console.error('🚨 Server Error:', err.stack);
   res.status(500).json({ 
     message: 'Something went wrong!',
     error: process.env.NODE_ENV === 'development' ? err.message : {}
   });
 });
 
-// 404 handler - FIXED LINE
-app.use('*catchall', (req, res) => {
+// 404 handler
+app.all('*', (req, res) => {
+  console.log(`❌ 404 - Route not found: ${req.method} ${req.originalUrl}`);
   res.status(404).json({ message: 'Route not found' });
 });
 
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT} in ${process.env.NODE_ENV} mode`);
+  console.log('🎉 75 Hard Challenge Backend Server Started!');
+  console.log(`🌐 Server running on port ${PORT}`);
+  console.log(`🔧 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`📅 Started at: ${new Date().toISOString()}`);
+  console.log('─'.repeat(50));
 });
 
 module.exports = app;
