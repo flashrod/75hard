@@ -52,6 +52,23 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+app.use((req, res, next) => {
+  try {
+    next();
+  } catch (error) {
+    if (error instanceof TypeError && error.message.includes('Missing parameter name')) {
+      console.error('⚠️ Route parameter error:', error.message);
+      res.status(400).json({ 
+        message: 'Invalid route configuration',
+        error: process.env.NODE_ENV === 'development' ? error.message : {}
+      });
+    } else {
+      next(error);
+    }
+  }
+});
+
+
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('🚨 Server Error:', err.stack);
