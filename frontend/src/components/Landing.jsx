@@ -1,11 +1,23 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
+import { getOptimalTextColor, getContrastRatio } from '../utils/colors';
 
 const Landing = ({ theme }) => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 1000], [0, -200]);
   const y2 = useTransform(scrollY, [0, 1000], [0, 200]);
   const opacity = useTransform(scrollY, [0, 300], [1, 0]);
+
+  // Calculate optimal text colors based on background
+  const primaryTextColor = getOptimalTextColor(theme.primary);
+  const secondaryTextColor = getOptimalTextColor(theme.secondary);
+  
+  // Ensure good contrast for body text
+  const bodyTextColor = getContrastRatio(theme.primary, '#ffffff') >= 4.5 
+    ? '#ffffff' 
+    : getContrastRatio(theme.primary, '#000000') >= 4.5 
+      ? '#000000' 
+      : primaryTextColor;
 
   return (
     <div className="relative">
@@ -46,21 +58,19 @@ const Landing = ({ theme }) => {
         </motion.div>
 
         <motion.div
-          style={{ y: y2 }}
+          style={{ y: y2, backgroundColor: theme.secondary }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.15, scale: 1 }}
           transition={{ duration: 2, repeat: Infinity, repeatType: "reverse" }}
           className="absolute top-20 left-20 w-96 h-96 rounded-full blur-3xl"
-          style={{ backgroundColor: theme.secondary }}
         />
         
         <motion.div
-          style={{ y: y1 }}
+          style={{ y: y1, backgroundColor: theme.tertiary }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 0.1, scale: 1 }}
           transition={{ duration: 2, delay: 1, repeat: Infinity, repeatType: "reverse" }}
           className="absolute bottom-20 right-20 w-80 h-80 rounded-full blur-3xl"
-          style={{ backgroundColor: theme.tertiary }}
         />
 
         {/* Main content */}
@@ -77,7 +87,7 @@ const Landing = ({ theme }) => {
             <motion.h1 
               className="text-6xl md:text-8xl lg:text-9xl font-black mb-8 leading-none"
               style={{ 
-                background: `linear-gradient(135deg, #ffffff 0%, ${theme.secondary} 30%, ${theme.tertiary} 70%, #ffffff 100%)`,
+                background: `linear-gradient(135deg, ${bodyTextColor} 0%, ${theme.secondary} 30%, ${theme.tertiary} 70%, ${bodyTextColor} 100%)`,
                 backgroundClip: 'text',
                 WebkitBackgroundClip: 'text',
                 color: 'transparent',
@@ -110,7 +120,11 @@ const Landing = ({ theme }) => {
               initial={{ opacity: 0, y: 50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, delay: 0.3 }}
-              className="text-2xl md:text-3xl max-w-4xl mx-auto leading-relaxed text-white/90 font-light"
+              className="text-2xl md:text-3xl max-w-4xl mx-auto leading-relaxed font-light"
+              style={{ 
+                color: bodyTextColor,
+                textShadow: `0 2px 10px ${theme.primary}80`
+              }}
             >
               Transform your mindset, build unbreakable discipline, and achieve your goals with the ultimate mental toughness program.
             </motion.p>
@@ -129,7 +143,7 @@ const Landing = ({ theme }) => {
               className="relative px-12 py-5 font-black text-xl rounded-2xl overflow-hidden shadow-2xl group"
               style={{ 
                 background: `linear-gradient(135deg, ${theme.secondary}, ${theme.tertiary})`,
-                color: theme.primary,
+                color: getOptimalTextColor(theme.secondary),
                 boxShadow: `0 20px 40px ${theme.secondary}40`
               }}
             >
@@ -154,7 +168,7 @@ const Landing = ({ theme }) => {
               className="relative px-12 py-5 font-black text-xl rounded-2xl border-2 transition-all duration-500 overflow-hidden group"
               style={{ 
                 borderColor: theme.secondary,
-                color: '#ffffff',
+                color: bodyTextColor,
                 background: 'rgba(255,255,255,0.05)',
                 backdropFilter: 'blur(10px)'
               }}
@@ -217,7 +231,12 @@ const Landing = ({ theme }) => {
                 >
                   {stat.number}
                 </motion.div>
-                <div className="text-white/80 text-lg font-medium">{stat.label}</div>
+                <div 
+                  className="text-lg font-medium"
+                  style={{ color: bodyTextColor }}
+                >
+                  {stat.label}
+                </div>
               </motion.div>
             ))}
           </motion.div>
@@ -233,7 +252,7 @@ const Landing = ({ theme }) => {
           <motion.div
             animate={{ y: [0, 15, 0] }}
             transition={{ duration: 2, repeat: Infinity }}
-            className="w-8 h-12 rounded-full border-2 border-white/40 flex justify-center backdrop-blur-sm"
+            className="w-8 h-12 rounded-full border-2 flex justify-center backdrop-blur-sm"
             style={{ borderColor: theme.secondary }}
           >
             <motion.div
@@ -247,8 +266,11 @@ const Landing = ({ theme }) => {
       </motion.section>
       
       {/* Additional content section */}
-      <section className="min-h-screen flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, #000000 100%)` }}>
-        <div className="text-center text-white max-w-4xl mx-auto px-4">
+      <section 
+        className="min-h-screen flex items-center justify-center" 
+        style={{ background: `linear-gradient(135deg, ${theme.primary} 0%, #000000 100%)` }}
+      >
+        <div className="text-center max-w-4xl mx-auto px-4">
           <motion.h2 
             className="text-6xl font-bold mb-8"
             style={{ 
@@ -260,7 +282,13 @@ const Landing = ({ theme }) => {
           >
             The Challenge Rules
           </motion.h2>
-          <motion.p className="text-2xl leading-relaxed text-white/80">
+          <motion.p 
+            className="text-2xl leading-relaxed"
+            style={{ 
+              color: bodyTextColor,
+              textShadow: `0 2px 10px ${theme.primary}80`
+            }}
+          >
             Follow a diet, work out twice daily, drink a gallon of water, read 10 pages, and take a progress photo every single day for 75 days straight.
           </motion.p>
         </div>
@@ -270,4 +298,3 @@ const Landing = ({ theme }) => {
 };
 
 export default Landing;
-// This code defines a Landing component for a web application, using React and Framer Motion for animations.
