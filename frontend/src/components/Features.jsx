@@ -1,47 +1,26 @@
-import { motion } from "framer-motion";
+// src/components/Features.jsx
 
-const features = [
-  {
-    title: "Daily Tracking",
-    desc: "Track your workouts, water intake, diet, reading, and progress photos all in one place.",
-    icon: "📊",
-    color: "bg-secondary"
-  },
-  {
-    title: "Progress Photos",
-    desc: "Upload daily photos to visually track your transformation over 75 days.",
-    icon: "📸",
-    color: "bg-tertiary"
-  },
-  {
-    title: "Mental Toughness",
-    desc: "Build unbreakable discipline through consistent daily habits and accountability.",
-    icon: "💪",
-    color: "bg-secondary"
-  },
-  {
-    title: "No Excuses",
-    desc: "Miss a single task? Start over from day 1. This challenge demands perfection.",
-    icon: "🔥",
-    color: "bg-tertiary"
-  },
-  {
-    title: "Community Support",
-    desc: "Join thousands of others on the same journey towards mental and physical transformation.",
-    icon: "👥",
-    color: "bg-secondary"
-  },
-  {
-    title: "Habit Formation",
-    desc: "Create lasting habits that will serve you long after the 75 days are complete.",
-    icon: "⚡",
-    color: "bg-tertiary"
-  }
-];
+import { motion } from 'framer-motion';
+import { getOptimalTextColor } from '../utils/colors';
 
-export default function Features() {
+export default function Features({ theme }) {
+  // --- THEME-AWARE STYLES ---
+  const mainTextColor = getOptimalTextColor(theme.primary);
+  const cardBg = `linear-gradient(145deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01))`;
+  const cardBorderStyle = `1px solid ${theme.secondary}20`;
+
+  // Define features array inside the component to access the theme prop
+  const features = [
+    { title: "Daily Tracking", desc: "Track everything in one place.", icon: "📊", color: theme.secondary },
+    { title: "Progress Photos", desc: "Visually track your transformation.", icon: "📸", color: theme.tertiary },
+    { title: "Mental Toughness", desc: "Build unbreakable discipline.", icon: "💪", color: theme.secondary },
+    { title: "No Excuses", desc: "Miss a task? Start from day 1.", icon: "🔥", color: theme.tertiary },
+    { title: "Community Support", desc: "Join thousands on the same journey.", icon: "👥", color: theme.secondary },
+    { title: "Habit Formation", desc: "Create lasting, life-changing habits.", icon: "⚡", color: theme.tertiary }
+  ];
+
   return (
-    <section className="bg-text py-20">
+    <section className="py-20" style={{ background: theme.primary }}>
       <div className="max-w-6xl mx-auto px-4">
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -50,11 +29,22 @@ export default function Features() {
           viewport={{ once: true }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl md:text-5xl font-display font-bold text-primary mb-4">
-            Why Choose <span className="text-secondary">75 Hard?</span>
+          <h2
+            className="text-4xl md:text-5xl font-display font-bold mb-4"
+            style={{ color: mainTextColor, textShadow: '0 1px 3px rgba(0,0,0,0.5)' }}
+          >
+            Why Choose{' '}
+            <span style={{
+              backgroundImage: `linear-gradient(45deg, ${theme.secondary}, ${theme.tertiary})`,
+              WebkitBackgroundClip: 'text',
+              backgroundClip: 'text',
+              color: 'transparent'
+            }}>
+              75 Hard?
+            </span>
           </h2>
-          <p className="text-xl text-primary max-w-2xl mx-auto">
-            This isn't just another fitness challenge. It's a complete mental transformation program.
+          <p className="text-xl max-w-2xl mx-auto" style={{ color: mainTextColor, opacity: 0.8 }}>
+            This isn't just another fitness challenge. It's a mental transformation program.
           </p>
         </motion.div>
 
@@ -66,14 +56,31 @@ export default function Features() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: index * 0.1, duration: 0.6 }}
               viewport={{ once: true }}
-              whileHover={{ scale: 1.05 }}
-              className="bg-primary rounded-2xl p-8 shadow-primary hover:shadow-secondary transition-all duration-300"
+              whileHover={{ scale: 1.05, y: -5 }}
+              className="rounded-2xl p-8 transition-all duration-300"
+              style={{
+                background: cardBg,
+                border: cardBorderStyle,
+                backdropFilter: 'blur(10px)',
+                boxShadow: `0 8px 32px rgba(0, 0, 0, 0.2)`
+              }}
             >
-              <div className={`w-16 h-16 ${feature.color} rounded-xl flex items-center justify-center text-2xl mb-6 mx-auto`}>
+              <div
+                className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl mb-6 mx-auto"
+                style={{
+                  background: feature.color,
+                  // Ensure the icon emoji is visible on its colored background
+                  color: getOptimalTextColor(feature.color)
+                }}
+              >
                 {feature.icon}
               </div>
-              <h3 className="text-xl font-bold text-text mb-4 text-center">{feature.title}</h3>
-              <p className="text-tertiary text-center leading-relaxed">{feature.desc}</p>
+              <h3 className="text-xl font-bold mb-4 text-center" style={{ color: mainTextColor }}>
+                {feature.title}
+              </h3>
+              <p className="text-center leading-relaxed" style={{ color: mainTextColor, opacity: 0.7 }}>
+                {feature.desc}
+              </p>
             </motion.div>
           ))}
         </div>
