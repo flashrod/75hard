@@ -1,55 +1,29 @@
 // src/pages/Home.jsx
 
-import React, { useState } from "react";
-import Navbar from "../components/NavBar";
+import React from "react";
+// Navbar, Footer, and ColorPicker are now managed in App.jsx
+// import Navbar from "../components/Navbar";
+// import Footer from "../components/Footer";
+// import ColorPicker from "../components/ColorPicker";
+
 import Landing from "../components/Landing";
-import ColorPicker from "../components/ColorPicker";
-
-// FIXED: Added the missing component imports
 import Features from "../components/Features";
-import CallToAction from "../components/CalltoAction";
-import Footer from "../components/Footer";
+import CallToAction from "../components/CallToAction";
 
-export default function Home() {
-  // --- THEME STATE ---
-  // This state will be passed down as props to all child components
-  const [theme, setTheme] = useState({
-    name: 'Ocean',
-    primary: '#0B1426',
-    secondary: '#00D4FF',
-    tertiary: '#4ECDC4',
-    accent: '#FF6B6B'
-  });
-  
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
-
-  const handleThemeChange = (newTheme) => {
-    setTheme(newTheme);
-  };
+// Accept theme and colorPicker props from App.jsx
+export default function Home({ theme, colorPickerOpen, setColorPickerOpen }) {
+  // theme state removed - now comes from props
 
   return (
     <div className="relative min-h-screen">
-      {/* The Navbar component receives the theme and the function to open the color picker */}
-      <Navbar 
-        theme={theme} 
-        onColorPickerOpen={() => setColorPickerOpen(true)} 
-      />
+      {/* Navbar, Footer, ColorPicker removed from here - now in App.jsx */}
       
-      {/* Each major section of your page receives the current theme as a prop */}
+      {/* All sections receive theme as prop */}
       <Landing theme={theme} />
-      
       <Features theme={theme} />
-      
       <CallToAction theme={theme} />
       
-      
-      {/* The ColorPicker component controls the theme for the entire page */}
-      <ColorPicker
-        theme={theme}
-        onThemeChange={handleThemeChange}
-        isOpen={colorPickerOpen}
-        onClose={() => setColorPickerOpen(false)}
-      />
+      {/* Footer and ColorPicker are handled by App.jsx now */}
     </div>
   );
 }

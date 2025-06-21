@@ -106,7 +106,6 @@ export default function Challenge({ theme }) {
           </Link>
         </div>
       </main>
-      <Footer theme={theme} />
     </div>
   );
 }

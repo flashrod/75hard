@@ -107,7 +107,6 @@ export default function Rules({ theme }) {
           </Link>
         </div>
       </main>
-      <Footer theme={theme} />
     </div>
   );
 }
