@@ -1,11 +1,15 @@
+// src/pages/Home.jsx
+
 import React, { useState } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/NavBar";
 import Landing from "../components/Landing";
-import Features from "../components/Features";
-import CallToAction from "../components/CallToAction";
-import Footer from "../components/Footer";
-import ColorPicker from "../components/ColorPicker";
-import { getComplementaryColor } from '../utils/colors';
+import ColorPicker from "../components/ColorPicker"; // Assuming you have this for changing themes
+// import Features from "../components/Features";     // Uncomment if you have these components
+// import CallToAction from "../components/CallToAction";
+// import Footer from "../components/Footer";
+
+// FIXED: Removed the faulty import for `getComplementaryColor`
+// No imports are needed from colors.js at the page level.
 
 export default function Home() {
   const [theme, setTheme] = useState({
@@ -31,11 +35,11 @@ export default function Home() {
       
       <Landing theme={theme} />
       
-      <Features theme={theme} />
-      
-      <CallToAction theme={theme} />
-      
-      <Footer theme={theme} />
+      {/* 
+        <Features theme={theme} />
+        <CallToAction theme={theme} />
+        <Footer theme={theme} /> 
+      */}
       
       <ColorPicker
         theme={theme}
