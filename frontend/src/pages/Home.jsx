@@ -42,7 +42,6 @@ export default function Home() {
       
       <CallToAction theme={theme} />
       
-      <Footer theme={theme} />
       
       {/* The ColorPicker component controls the theme for the entire page */}
       <ColorPicker

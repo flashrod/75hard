@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Link, useNavigate, useLocation } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Palette, Zap, LogIn, LogOut, User, Trophy, BarChart } from 'lucide-react';
 import { getOptimalTextColor } from '../utils/colors';
@@ -10,23 +10,20 @@ import { getOptimalTextColor } from '../utils/colors';
 const Navbar = ({ theme, onColorPickerOpen }) => {
   const { backendUser, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // --- THEME-AWARE STYLES ---
   const navTextColor = getOptimalTextColor(theme.primary);
   const buttonTextColor = getOptimalTextColor(theme.secondary);
 
   const handleLogout = async () => {
     await logout();
-    navigate('/'); // Redirect to home page after logout
+    navigate('/');
   };
 
-  // --- NAVIGATION LINKS ---
-  // The "Challenge" and "Rules" links are now included.
-  // They will intelligently navigate to the homepage sections.
+  // --- NAVIGATION LINKS (FIXED) ---
+  // The paths now correctly point to the dedicated page routes.
   const mainLinks = [
-    { name: 'Challenge', path: '/#challenge', icon: Trophy },
-    { name: 'Rules', path: '/#rules', icon: BarChart },
+    { name: 'Challenge', path: '/challenge', icon: Trophy }, // FIXED: Path changed
+    { name: 'Rules', path: '/rules', icon: BarChart },       // FIXED: Path changed
   ];
 
   return (
@@ -55,7 +52,7 @@ const Navbar = ({ theme, onColorPickerOpen }) => {
           {mainLinks.map((item) => (
             <Link
               key={item.name}
-              to={item.path}
+              to={item.path} // This now uses the correct path
               className="flex items-center gap-2 text-sm font-semibold transition-colors hover:text-white"
               style={{
                 color: navTextColor,
@@ -89,7 +86,6 @@ const Navbar = ({ theme, onColorPickerOpen }) => {
             </>
           ) : (
             // --- Guest View ---
-            // The prominent, colored Login button
             <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
                 to="/auth"
