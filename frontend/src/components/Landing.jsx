@@ -1,6 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import { Palette, X } from 'lucide-react';
 
 const Landing = ({ theme }) => {
   const { scrollY } = useScroll();
@@ -11,10 +10,10 @@ const Landing = ({ theme }) => {
   return (
     <div className="relative">
       <motion.section 
-        className="min-h-screen flex flex-col justify-center items-center px-4 relative overflow-hidden"
+        className="min-h-screen flex flex-col justify-center items-center px-4 relative overflow-hidden pt-20"
         style={{ 
-          background: `radial-gradient(ellipse at top, ${theme.primary}00 0%, ${theme.primary} 50%), linear-gradient(135deg, ${theme.primary} 0%, #000000 100%)` ,
-          paddingTop: '5rem',
+          background: `radial-gradient(ellipse at top, ${theme.primary}00 0%, ${theme.primary} 50%), linear-gradient(135deg, ${theme.primary} 0%, #000000 100%)`,
+          paddingTop: '5rem'
         }}
       >
         {/* Dynamic background elements */}
@@ -270,176 +269,5 @@ const Landing = ({ theme }) => {
   );
 };
 
-const ColorPicker = ({ theme, onThemeChange, isOpen, onClose }) => {
-  const [customTheme, setCustomTheme] = useState(theme);
-
-  const presetThemes = [
-    {
-      name: 'Ocean',
-      primary: '#0B1426',
-      secondary: '#00D4FF',
-      tertiary: '#4ECDC4',
-      accent: '#FF6B6B'
-    },
-    {
-      name: 'Fire',
-      primary: '#1A0A0A',
-      secondary: '#FF4500',
-      tertiary: '#FF6B35',
-      accent: '#FFB347'
-    },
-    {
-      name: 'Forest',
-      primary: '#0D1B0D',
-      secondary: '#00FF41',
-      tertiary: '#32CD32',
-      accent: '#90EE90'
-    },
-    {
-      name: 'Purple',
-      primary: '#1A0D1A',
-      secondary: '#8A2BE2',
-      tertiary: '#DA70D6',
-      accent: '#DDA0DD'
-    },
-    {
-      name: 'Cyber',
-      primary: '#0A0A0A',
-      secondary: '#00FFFF',
-      tertiary: '#FF00FF',
-      accent: '#FFFF00'
-    }
-  ];
-
-  const handleColorChange = (colorKey, color) => {
-    const newTheme = { ...customTheme, [colorKey]: color };
-    setCustomTheme(newTheme);
-    onThemeChange(newTheme);
-  };
-
-  const handlePresetSelect = (preset) => {
-    setCustomTheme(preset);
-    onThemeChange(preset);
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      className="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4"
-    >
-      <motion.div
-        initial={{ scale: 0.8, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        exit={{ scale: 0.8, opacity: 0 }}
-        className="bg-gray-900/90 backdrop-blur-xl rounded-3xl p-8 max-w-2xl w-full max-h-[80vh] overflow-y-auto border border-white/10"
-      >
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold text-white">Customize Colors</h2>
-          <button
-            onClick={onClose}
-            className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
-          >
-            <X className="w-6 h-6 text-white" />
-          </button>
-        </div>
-
-        {/* Preset Themes */}
-        <div className="mb-8">
-          <h3 className="text-xl font-semibold text-white mb-4">Preset Themes</h3>
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-            {presetThemes.map((preset) => (
-              <motion.button
-                key={preset.name}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => handlePresetSelect(preset)}
-                className="p-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all border border-white/10 hover:border-white/20"
-              >
-                <div className="flex space-x-2 mb-2">
-                  <div className="w-6 h-6 rounded-full" style={{ backgroundColor: preset.primary }} />
-                  <div className="w-6 h-6 rounded-full" style={{ backgroundColor: preset.secondary }} />
-                  <div className="w-6 h-6 rounded-full" style={{ backgroundColor: preset.tertiary }} />
-                </div>
-                <div className="text-white font-medium">{preset.name}</div>
-              </motion.button>
-            ))}
-          </div>
-        </div>
-
-        {/* Custom Colors */}
-        <div>
-          <h3 className="text-xl font-semibold text-white mb-4">Custom Colors</h3>
-          <div className="space-y-6">
-            {[
-              { key: 'primary', label: 'Primary (Background)', description: 'Main background color' },
-              { key: 'secondary', label: 'Secondary (Accent)', description: 'Primary accent color' },
-              { key: 'tertiary', label: 'Tertiary (Highlight)', description: 'Secondary accent color' },
-              { key: 'accent', label: 'Accent (Extra)', description: 'Additional accent color' }
-            ].map(({ key, label, description }) => (
-              <div key={key} className="flex items-center justify-between p-4 rounded-2xl bg-white/5 border border-white/10">
-                <div>
-                  <div className="text-white font-medium">{label}</div>
-                  <div className="text-white/60 text-sm">{description}</div>
-                </div>
-                <div className="flex items-center space-x-3">
-                  <div
-                    className="w-12 h-12 rounded-xl border-2 border-white/20"
-                    style={{ backgroundColor: customTheme[key] }}
-                  />
-                  <input
-                    type="color"
-                    value={customTheme[key]}
-                    onChange={(e) => handleColorChange(key, e.target.value)}
-                    className="w-16 h-12 rounded-xl border-2 border-white/20 bg-transparent cursor-pointer"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <motion.button
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-          onClick={onClose}
-          className="w-full mt-8 py-4 font-bold text-lg rounded-2xl transition-all"
-          style={{ 
-            background: `linear-gradient(135deg, ${customTheme.secondary}, ${customTheme.tertiary})`,
-            color: customTheme.primary
-          }}
-        >
-          Apply Changes
-        </motion.button>
-      </motion.div>
-    </motion.div>
-  );
-};
-
-export default function App() {
-  const [theme, setTheme] = useState({
-    name: 'Ocean',
-    primary: '#0B1426',
-    secondary: '#00D4FF',
-    tertiary: '#4ECDC4',
-    accent: '#FF6B6B'
-  });
-  
-  const [colorPickerOpen, setColorPickerOpen] = useState(false);
-
-  return (
-    <div className="relative">
-      <Landing theme={theme} />
-      
-      <ColorPicker
-        theme={theme}
-        onThemeChange={setTheme}
-        isOpen={colorPickerOpen}
-        onClose={() => setColorPickerOpen(false)}
-      />
-    </div>
-  );
-}
+export default Landing;
+// This code defines a Landing component for a web application, using React and Framer Motion for animations.
