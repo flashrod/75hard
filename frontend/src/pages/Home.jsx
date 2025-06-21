@@ -1,13 +1,13 @@
 // src/pages/Home.jsx
 
 import React, { useState } from "react";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/NavBar";
 import Landing from "../components/Landing";
 import ColorPicker from "../components/ColorPicker";
 
 // FIXED: Added the missing component imports
 import Features from "../components/Features";
-import CallToAction from "../components/CallToAction";
+import CallToAction from "../components/CalltoAction";
 import Footer from "../components/Footer";
 
 export default function Home() {

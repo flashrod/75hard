@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import apiService from "../services/api";
-import Navbar from "../components/Navbar";
+import Navbar from "../components/NavBar";
 import Footer from "../components/Footer";
 import ColorPicker from "../components/ColorPicker"; // Import the color picker
 import { getOptimalTextColor } from "../utils/colors"; // Import the visibility utility

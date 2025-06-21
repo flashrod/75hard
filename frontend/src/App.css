@@ -1,73 +1,41 @@
+/* src/app.css (Corrected and Final Version) */
+
+/* --- 1. FONT IMPORTS (Keep These) --- */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@400;500;600;700;800&display=swap');
 
+/* --- 2. TAILWIND IMPORTS (Keep This) --- */
 @import "tailwindcss";
 
-
-/* Custom color variables for your new palette */
-:root {
-  --primary: #6892ef;
-  --secondary: #f0cd3d;
-  --tertiary: #fef2f0;
-  --text: #ffffff;
-}
-
-/* Custom utility classes */
-.bg-primary { background-color: var(--primary); }
-.bg-secondary { background-color: var(--secondary); }
-.bg-tertiary { background-color: var(--tertiary); }
-.bg-text { background-color: var(--text); }
-
-.text-primary { color: var(--primary); }
-.text-secondary { color: var(--secondary); }
-.text-tertiary { color: var(--tertiary); }
-.text-text { color: var(--text); }
-
-.border-primary { border-color: var(--primary); }
-.border-secondary { border-color: var(--secondary); }
-.border-tertiary { border-color: var(--tertiary); }
-.border-text { border-color: var(--text); }
-
-/* Ring colors for focus states */
-.ring-primary { --tw-ring-color: var(--primary); }
-.ring-secondary { --tw-ring-color: var(--secondary); }
-
-/* Hover variants */
-.hover\:bg-primary:hover { background-color: var(--primary); }
-.hover\:bg-secondary:hover { background-color: var(--secondary); }
-.hover\:text-primary:hover { color: var(--primary); }
-.hover\:text-secondary:hover { color: var(--secondary); }
-
-/* Custom fonts */
-
+/* --- 3. GLOBAL BODY AND FONT STYLES (Keep These) --- */
 body {
   font-family: 'Inter', sans-serif;
-  background-color: var(--primary);
-  color: var(--text);
+  /* 
+    REMOVED: background-color and color. 
+    This will now be controlled by the main wrapper div in your Home.jsx, 
+    allowing the dynamic theme to work correctly.
+  */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .font-display {
   font-family: 'Montserrat', sans-serif;
 }
 
-/* Additional utility classes for gradients */
-.bg-gradient-primary {
-  background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
-}
+/* 
+   --- REMOVED ---
+   The following sections have been REMOVED because they create a static theme 
+   that conflicts with your dynamic React theme system. Your React components 
+   now handle all color styling directly.
 
-.bg-gradient-secondary {
-  background: linear-gradient(135deg, var(--secondary) 0%, var(--tertiary) 100%);
-}
+   - REMOVED: :root { ... } color variables.
+   - REMOVED: All custom .bg-*, .text-*, and .border-* utility classes.
+   - REMOVED: All .bg-gradient-* and .shadow-* classes that used static colors.
+*/
 
-/* Custom shadows with your colors */
-.shadow-primary {
-  box-shadow: 0 10px 25px rgba(104, 146, 239, 0.3);
-}
-
-.shadow-secondary {
-  box-shadow: 0 10px 25px rgba(240, 205, 61, 0.3);
-}
-
-/* GitHub Calendar Custom Styles */
+/* --- 4. GITHUB CALENDAR STYLES (Keep These, but make them theme-neutral) --- */
+/* These styles are for structure and layout, not color. 
+   Colors for the calendar are now passed directly from your Dashboard component. */
 .react-activity-calendar {
   width: 100% !important;
 }
@@ -76,22 +44,13 @@ body {
   font-family: 'Inter', sans-serif !important;
 }
 
-.react-activity-calendar .react-activity-calendar__legend {
-  font-size: 12px !important;
-  color: var(--primary) !important;
-}
+/* 
+  REMOVED: Hardcoded color styles for calendar text. 
+  Your Dashboard component now passes a dynamic `theme` object to the calendar,
+  which controls the colors of the blocks and text.
+*/
 
-.react-activity-calendar .react-activity-calendar__month {
-  font-size: 12px !important;
-  color: var(--primary) !important;
-}
-
-.react-activity-calendar .react-activity-calendar__weekday {
-  font-size: 10px !important;
-  color: var(--primary) !important;
-}
-
-/* Responsive calendar */
+/* --- 5. RESPONSIVE STYLES (Keep These) --- */
 @media (max-width: 768px) {
   .react-activity-calendar {
     transform: scale(0.8);
