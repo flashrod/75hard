@@ -13,7 +13,8 @@ const Landing = ({ theme }) => {
       <motion.section 
         className="min-h-screen flex flex-col justify-center items-center px-4 relative overflow-hidden"
         style={{ 
-          background: `radial-gradient(ellipse at top, ${theme.primary}00 0%, ${theme.primary} 50%), linear-gradient(135deg, ${theme.primary} 0%, #000000 100%)` 
+          background: `radial-gradient(ellipse at top, ${theme.primary}00 0%, ${theme.primary} 50%), linear-gradient(135deg, ${theme.primary} 0%, #000000 100%)` ,
+          paddingTop: '5rem',
         }}
       >
         {/* Dynamic background elements */}
@@ -433,20 +434,6 @@ export default function App() {
     <div className="relative">
       <Landing theme={theme} />
       
-      {/* Color Picker Toggle Button */}
-      <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setColorPickerOpen(true)}
-        className="fixed top-6 right-6 p-4 rounded-full backdrop-blur-xl border border-white/20 z-40 shadow-2xl"
-        style={{ 
-          background: 'rgba(255,255,255,0.1)',
-          color: theme.secondary
-        }}
-      >
-        <Palette className="w-6 h-6" />
-      </motion.button>
-
       <ColorPicker
         theme={theme}
         onThemeChange={setTheme}

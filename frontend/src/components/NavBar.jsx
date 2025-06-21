@@ -1,286 +1,221 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Palette, Menu, X, Zap, Target, Trophy } from 'lucide-react';
+import { getComplementaryColor } from '../utils/colors';
 
-const ColorPicker = ({ onColorChange, currentTheme }) => {
+const Navbar = ({ theme, onColorPickerOpen }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [activeItem, setActiveItem] = useState('Home');
+  const { scrollY } = useScroll();
   
-  const themes = [
-    { name: 'Ocean', primary: '#0B1426', secondary: '#00D4FF', tertiary: '#4ECDC4', accent: '#FF6B6B' },
-    { name: 'Sunset', primary: '#1A0B2E', secondary: '#FF6B35', tertiary: '#F7931E', accent: '#FFE66D' },
-    { name: 'Forest', primary: '#0F2027', secondary: '#2BC0E4', tertiary: '#EAECC6', accent: '#2ECC71' },
-    { name: 'Neon', primary: '#0C0C0C', secondary: '#FF0080', tertiary: '#00FFFF', accent: '#FFFF00' },
-    { name: 'Royal', primary: '#1B1B2F', secondary: '#7209B7', tertiary: '#B8860B', accent: '#F39C12' },
-    { name: 'Arctic', primary: '#0A1D29', secondary: '#4A90E2', tertiary: '#87CEEB', accent: '#E8F4FD' }
+  const navbarOpacity = useTransform(scrollY, [0, 100], [0.95, 1]);
+  const navbarBlur = useTransform(scrollY, [0, 100], [10, 20]);
+  
+  const compColor = getComplementaryColor(theme.primary);
+  
+  const navItems = [
+    { name: 'Home', href: '#home', icon: Target },
+    { name: 'Challenge', href: '#challenge', icon: Zap },
+    { name: 'Rules', href: '#rules', icon: Trophy },
+    { name: 'Progress', href: '#progress', icon: Target },
   ];
 
-  return (
-    <div className="fixed top-24 right-6 z-50">
-      <motion.button
-        whileHover={{ scale: 1.15, rotate: 180 }}
-        whileTap={{ scale: 0.9 }}
-        onClick={() => setIsOpen(!isOpen)}
-        className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-2xl group"
-        style={{ 
-          background: `conic-gradient(from 0deg, ${currentTheme.secondary}, ${currentTheme.tertiary}, ${currentTheme.accent || currentTheme.secondary}, ${currentTheme.secondary})`,
-          boxShadow: `0 8px 32px ${currentTheme.secondary}60, inset 0 1px 0 rgba(255,255,255,0.2)`
-        }}
-      >
-        <motion.div
-          className="absolute inset-1 rounded-xl bg-black/20 backdrop-blur-md flex items-center justify-center"
-          animate={{ rotate: isOpen ? 0 : -180 }}
-          transition={{ duration: 0.6, ease: "easeInOut" }}
-        >
-          <motion.div
-            className="w-8 h-8 rounded-lg"
-            style={{ 
-              background: `linear-gradient(45deg, ${currentTheme.secondary}80, ${currentTheme.tertiary}80)`,
-              boxShadow: `0 0 20px ${currentTheme.secondary}40`
-            }}
-            animate={{ 
-              scale: [1, 1.1, 1],
-              opacity: [0.8, 1, 0.8]
-            }}
-            transition={{ duration: 2, repeat: Infinity }}
-          />
-        </motion.div>
-        
-        {/* Floating particles around button */}
-        {[...Array(6)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-1 h-1 rounded-full"
-            style={{ 
-              backgroundColor: currentTheme.secondary,
-              left: '50%',
-              top: '50%',
-            }}
-            animate={{
-              x: [0, Math.cos(i * 60 * Math.PI / 180) * 30],
-              y: [0, Math.sin(i * 60 * Math.PI / 180) * 30],
-              opacity: [0, 1, 0],
-              scale: [0, 1.5, 0]
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              delay: i * 0.1,
-              ease: "easeInOut"
-            }}
-          />
-        ))}
-      </motion.button>
-      
-      {isOpen && (
-        <motion.div
-          initial={{ opacity: 0, y: -30, scale: 0.8, rotateX: -15 }}
-          animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
-          exit={{ opacity: 0, y: -30, scale: 0.8, rotateX: -15 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="absolute top-20 right-0 bg-black/30 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10"
-          style={{ 
-            background: `linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(255,255,255,0.1) 100%)`,
-            boxShadow: `0 25px 50px -12px ${currentTheme.secondary}40, inset 0 1px 0 rgba(255,255,255,0.1)`
-          }}
-        >
-          {/* Header */}
-          <div className="text-center mb-4">
-            <h3 className="text-white font-bold text-sm mb-1">Choose Theme</h3>
-            <div className="w-12 h-0.5 bg-gradient-to-r mx-auto rounded-full"
-                 style={{ backgroundImage: `linear-gradient(90deg, ${currentTheme.secondary}, ${currentTheme.tertiary})` }}
-            />
-          </div>
-          
-          <div className="grid grid-cols-2 gap-4">
-            {themes.map((theme, index) => (
-              <motion.button
-                key={theme.name}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-                whileHover={{ scale: 1.08, y: -4 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={() => {
-                  onColorChange(theme);
-                  setIsOpen(false);
-                }}
-                className="relative w-20 h-16 rounded-2xl overflow-hidden shadow-xl group"
-                style={{ 
-                  background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 40%, ${theme.tertiary} 100%)`,
-                  boxShadow: `0 8px 25px ${theme.secondary}30`
-                }}
-              >
-                {/* Shimmer effect */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
-                  whileHover={{ translateX: '200%' }}
-                  transition={{ duration: 0.6 }}
-                />
-                
-                {/* Inner glow */}
-                <div 
-                  className="absolute inset-0.5 rounded-xl opacity-60"
-                  style={{ 
-                    background: `radial-gradient(circle at 30% 30%, ${theme.secondary}40, transparent 70%)`
-                  }}
-                />
-                
-                {/* Theme name */}
-                <div className="absolute bottom-1.5 left-0 right-0 text-center">
-                  <span className="text-[10px] text-white/90 font-semibold tracking-wide drop-shadow-lg">
-                    {theme.name}
-                  </span>
-                </div>
-                
-                {/* Active indicator */}
-                {currentTheme.name === theme.name && (
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-1 right-1 w-3 h-3 rounded-full bg-white shadow-lg"
-                  >
-                    <div className="absolute inset-0.5 rounded-full bg-green-400"></div>
-                  </motion.div>
-                )}
-              </motion.button>
-            ))}
-          </div>
-          
-          {/* Footer */}
-          <div className="mt-4 text-center">
-            <span className="text-white/60 text-xs">Tap to switch themes instantly</span>
-          </div>
-        </motion.div>
-      )}
-    </div>
-  );
-};
-
-export default function Navbar({ theme, onColorChange }) {
-  const [currentUser, setCurrentUser] = useState(null); // Mock auth state - replace with your actual auth
-  const [isScrolled, setIsScrolled] = useState(false);
-
   useEffect(() => {
-    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    const handleScroll = () => {
+      const sections = navItems.map(item => document.querySelector(item.href));
+      const scrollPosition = window.scrollY + 100;
+
+      sections.forEach((section, index) => {
+        if (section) {
+          const top = section.offsetTop;
+          const bottom = top + section.offsetHeight;
+          
+          if (scrollPosition >= top && scrollPosition < bottom) {
+            setActiveItem(navItems[index].name);
+          }
+        }
+      });
+    };
+
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Dashboard", href: "/dashboard" },
-  ];
-
-  const handleLogout = () => {
-    // Replace this with your actual logout function
-    setCurrentUser(null);
-    console.log('Logout clicked');
-  };
-
   return (
-    <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className={`fixed top-0 left-0 w-full z-40 transition-all duration-500 ${
-          isScrolled ? 'bg-black/20 backdrop-blur-xl shadow-2xl' : 'bg-transparent'
-        }`}
-        style={{
-          borderBottom: isScrolled ? `1px solid ${theme.secondary}20` : 'none'
-        }}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 py-4">
+    <motion.nav
+      style={{ 
+        opacity: navbarOpacity,
+        backdropFilter: `blur(${navbarBlur}px)`,
+        background: `linear-gradient(90deg, ${theme.primary}dd 0%, ${theme.secondary}22 50%, ${theme.primary}dd 100%)`,
+        borderBottom: `1px solid ${theme.secondary}40`,
+        boxShadow: `0 8px 32px ${theme.secondary}20`
+      }}
+      className="fixed top-0 w-full z-50 transition-all duration-300"
+    >
+      <div className="max-w-7xl mx-auto px-6 py-4">
+        <div className="flex items-center justify-between">
+          {/* Logo */}
           <motion.div
             whileHover={{ scale: 1.05 }}
-            className="relative"
+            className="flex items-center space-x-3"
           >
-            <div 
-              className="font-black text-3xl tracking-wider bg-gradient-to-r bg-clip-text text-transparent cursor-pointer"
-              style={{ 
-                backgroundImage: `linear-gradient(45deg, ${theme.secondary}, ${theme.tertiary})` 
-              }}
-              onClick={() => window.location.href = '/'}
-            >
-              75HARD
-            </div>
             <motion.div
-              animate={{ scaleX: [0, 1, 0] }}
-              transition={{ duration: 2, repeat: Infinity, repeatDelay: 1 }}
-              className="absolute -bottom-1 left-0 right-0 h-0.5 bg-gradient-to-r"
-              style={{ 
-                backgroundImage: `linear-gradient(90deg, transparent, ${theme.secondary}, transparent)` 
+              animate={{ 
+                rotate: [0, 360],
+                scale: [1, 1.1, 1]
               }}
-            />
+              transition={{ 
+                duration: 4, 
+                repeat: Infinity, 
+                ease: "easeInOut" 
+              }}
+              className="w-10 h-10 rounded-xl flex items-center justify-center"
+              style={{ 
+                background: `linear-gradient(135deg, ${theme.secondary}, ${theme.tertiary})`,
+                boxShadow: `0 4px 20px ${theme.secondary}40`
+              }}
+            >
+              <Zap className="w-6 h-6" style={{ color: theme.primary }} />
+            </motion.div>
+            
+            <motion.h1 
+              className="text-3xl font-black tracking-tight"
+              style={{
+                background: `linear-gradient(45deg, ${theme.secondary}, ${theme.tertiary}, ${compColor})`,
+                backgroundClip: 'text',
+                WebkitBackgroundClip: 'text',
+                color: 'transparent',
+                textShadow: `0 2px 20px ${theme.secondary}50`
+              }}
+            >
+              75<span style={{ color: compColor }}>HARD</span>
+            </motion.h1>
           </motion.div>
 
-          <div className="flex items-center gap-8">
-            {navLinks.map((link, index) => (
-              <motion.a
-                key={link.name}
-                href={link.href}
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.1 }}
-                whileHover={{ y: -2 }}
-                className="relative text-white font-semibold text-lg transition-all duration-300 group"
-              >
-                {link.name}
-                <motion.div
-                  className="absolute -bottom-1 left-0 right-0 h-0.5 rounded-full"
-                  style={{ backgroundColor: theme.secondary }}
-                  initial={{ scaleX: 0 }}
-                  whileHover={{ scaleX: 1 }}
-                  transition={{ duration: 0.3 }}
-                />
-              </motion.a>
-            ))}
-            
-            {currentUser ? (
-              <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={handleLogout}
-                className="text-white font-semibold transition-colors duration-300"
-                style={{ color: theme.secondary }}
-              >
-                Logout
-              </motion.button>
-            ) : (
-              <motion.a
-                href="/auth"
-                whileHover={{ scale: 1.05, y: -2 }}
-                whileTap={{ scale: 0.95 }}
-                className="relative px-6 py-3 font-bold rounded-2xl overflow-hidden shadow-lg transition-all duration-300"
-                style={{ 
-                  background: `linear-gradient(135deg, ${theme.secondary}, ${theme.tertiary})`,
-                  color: theme.primary
-                }}
-              >
-                <motion.div
-                  className="absolute inset-0 bg-white/20"
-                  initial={{ x: '-100%' }}
-                  whileHover={{ x: '100%' }}
-                  transition={{ duration: 0.6 }}
-                />
-                <span className="relative z-10">Sign In</span>
-              </motion.a>
-            )}
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeItem === item.name;
+              
+              return (
+                <motion.a
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => setActiveItem(item.name)}
+                  whileHover={{ 
+                    scale: 1.1,
+                    y: -2
+                  }}
+                  whileTap={{ scale: 0.95 }}
+                  className="relative flex items-center space-x-2 px-4 py-2 rounded-xl font-semibold transition-all duration-300"
+                  style={{
+                    color: isActive ? compColor : '#ffffff',
+                    background: isActive ? `${theme.secondary}20` : 'transparent',
+                    border: isActive ? `1px solid ${theme.secondary}40` : '1px solid transparent',
+                    textShadow: isActive ? `0 0 10px ${compColor}80` : 'none'
+                  }}
+                >
+                  <Icon className="w-4 h-4" />
+                  <span>{item.name}</span>
+                  
+                  {isActive && (
+                    <motion.div
+                      layoutId="activeIndicator"
+                      className="absolute inset-0 rounded-xl"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${theme.secondary}30, ${theme.tertiary}30)`,
+                        border: `1px solid ${theme.secondary}60`
+                      }}
+                      transition={{ type: "spring", stiffness: 380, damping: 30 }}
+                    />
+                  )}
+                </motion.a>
+              );
+            })}
+          </div>
+
+          {/* Right Side Actions */}
+          <div className="flex items-center space-x-4">
+            {/* Color Picker Button */}
+            <motion.button
+              whileHover={{ 
+                scale: 1.1,
+                rotate: 180,
+                backgroundColor: `${compColor}22`
+              }}
+              whileTap={{ scale: 0.9 }}
+              onClick={onColorPickerOpen}
+              className="p-3 rounded-xl border transition-all duration-300"
+              style={{
+                borderColor: theme.secondary,
+                background: `linear-gradient(135deg, ${theme.secondary}20, ${theme.tertiary}20)`,
+                color: theme.secondary,
+                boxShadow: `0 4px 20px ${theme.secondary}30`
+              }}
+              aria-label="Open color picker"
+            >
+              <Palette className="w-5 h-5" />
+            </motion.button>
+
+            {/* Mobile Menu Toggle */}
+            <motion.button
+              whileHover={{ scale: 1.1 }}
+              whileTap={{ scale: 0.9 }}
+              onClick={() => setIsOpen(!isOpen)}
+              className="md:hidden p-3 rounded-xl border transition-all duration-300"
+              style={{
+                borderColor: theme.secondary,
+                background: `${theme.secondary}20`,
+                color: theme.secondary
+              }}
+            >
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </motion.button>
           </div>
         </div>
-      </motion.nav>
-      
-      <ColorPicker onColorChange={onColorChange} currentTheme={theme} />
-    </>
-  );
-}
 
-// Usage Example:
-// const [theme, setTheme] = useState({
-//   name: 'Ocean',
-//   primary: '#0B1426',
-//   secondary: '#00D4FF',
-//   tertiary: '#4ECDC4',
-//   accent: '#FF6B6B'
-// });
-// 
-// <Navbar theme={theme} onColorChange={setTheme} />
+        {/* Mobile Navigation */}
+        <motion.div
+          initial={false}
+          animate={{ 
+            height: isOpen ? 'auto' : 0,
+            opacity: isOpen ? 1 : 0
+          }}
+          transition={{ duration: 0.3, ease: "easeInOut" }}
+          className="md:hidden overflow-hidden"
+        >
+          <div className="pt-6 pb-4 space-y-4">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeItem === item.name;
+              
+              return (
+                <motion.a
+                  key={item.name}
+                  href={item.href}
+                  onClick={() => {
+                    setActiveItem(item.name);
+                    setIsOpen(false);
+                  }}
+                  whileHover={{ x: 10 }}
+                  className="flex items-center space-x-3 px-4 py-3 rounded-xl font-semibold transition-all duration-300"
+                  style={{
+                    color: isActive ? compColor : '#ffffff',
+                    background: isActive ? `${theme.secondary}20` : 'transparent',
+                    border: `1px solid ${isActive ? theme.secondary + '40' : 'transparent'}`
+                  }}
+                >
+                  <Icon className="w-5 h-5" />
+                  <span>{item.name}</span>
+                </motion.a>
+              );
+            })}
+          </div>
+        </motion.div>
+      </div>
+    </motion.nav>
+  );
+};
+
+export default Navbar;

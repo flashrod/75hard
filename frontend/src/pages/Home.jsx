@@ -4,6 +4,8 @@ import Features from "../components/Features";
 import CallToAction from "../components/CallToAction"
 import Footer from "../components/Footer";
 import React, { useState, useEffect } from "react";
+
+import { getComplementaryColor } from '../utils/colors'; 
 export default function Home() {
   const [theme, setTheme] = useState({
     name: 'Ocean',
@@ -15,8 +17,8 @@ export default function Home() {
 
   return (
     <div>
-      <Navbar theme={theme} onColorChange={setTheme} />
-      <Landing theme={theme} />
+      <Navbar theme={theme} onColorPickerOpen={() => setColorPickerOpen(true)} />
+  <Landing theme={theme} />
     </div>
   );
 }
