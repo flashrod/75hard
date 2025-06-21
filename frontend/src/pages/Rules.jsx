@@ -14,7 +14,7 @@ export default function Rules({ theme }) {
   return (
     <div style={{ background: theme.primary, color: textColor, minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
       <Navbar theme={theme} />
-      <main className="flex-grow max-w-5xl mx-auto px-6 py-20 mt-16 md:mt-24"> {/* Added mt for navbar offset */}
+      <main className="flex-grow max-w-5xl mx-auto px-6 py-20 mt-16 md:mt-24">
         <motion.h1
           className="text-5xl md:text-6xl font-extrabold mb-8 text-center"
           initial={{ opacity: 0, y: -20 }}
@@ -93,8 +93,9 @@ export default function Rules({ theme }) {
 
         {/* Get Started Button */}
         <div className="mt-20 text-center">
+          {/* FIXED: Corrected syntax for Link attributes */}
           <Link
-            to={localStorage.getItem('token') ? "/dashboard" : "/auth"} {/* Dynamic link */}
+            to={localStorage.getItem('token') ? "/dashboard" : "/auth"} // Dynamic link
             className="inline-block px-12 py-5 rounded-full font-bold text-xl shadow-lg transition-transform transform hover:scale-105"
             style={{
               background: `linear-gradient(135deg, ${theme.secondary}, ${theme.tertiary})`,
