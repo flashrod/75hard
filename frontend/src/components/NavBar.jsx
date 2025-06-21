@@ -16,43 +16,138 @@ const ColorPicker = ({ onColorChange, currentTheme }) => {
   return (
     <div className="fixed top-24 right-6 z-50">
       <motion.button
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
+        whileHover={{ scale: 1.15, rotate: 180 }}
+        whileTap={{ scale: 0.9 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="w-12 h-12 rounded-full bg-gradient-to-r from-purple-500 via-pink-500 to-red-500 shadow-lg flex items-center justify-center backdrop-blur-md"
-        style={{ background: `linear-gradient(45deg, ${currentTheme.secondary}, ${currentTheme.tertiary})` }}
+        className="relative w-16 h-16 rounded-2xl overflow-hidden shadow-2xl group"
+        style={{ 
+          background: `conic-gradient(from 0deg, ${currentTheme.secondary}, ${currentTheme.tertiary}, ${currentTheme.accent || currentTheme.secondary}, ${currentTheme.secondary})`,
+          boxShadow: `0 8px 32px ${currentTheme.secondary}60, inset 0 1px 0 rgba(255,255,255,0.2)`
+        }}
       >
-        <div className="w-6 h-6 rounded-full bg-white/20 backdrop-blur-sm"></div>
+        <motion.div
+          className="absolute inset-1 rounded-xl bg-black/20 backdrop-blur-md flex items-center justify-center"
+          animate={{ rotate: isOpen ? 0 : -180 }}
+          transition={{ duration: 0.6, ease: "easeInOut" }}
+        >
+          <motion.div
+            className="w-8 h-8 rounded-lg"
+            style={{ 
+              background: `linear-gradient(45deg, ${currentTheme.secondary}80, ${currentTheme.tertiary}80)`,
+              boxShadow: `0 0 20px ${currentTheme.secondary}40`
+            }}
+            animate={{ 
+              scale: [1, 1.1, 1],
+              opacity: [0.8, 1, 0.8]
+            }}
+            transition={{ duration: 2, repeat: Infinity }}
+          />
+        </motion.div>
+        
+        {/* Floating particles around button */}
+        {[...Array(6)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-1 h-1 rounded-full"
+            style={{ 
+              backgroundColor: currentTheme.secondary,
+              left: '50%',
+              top: '50%',
+            }}
+            animate={{
+              x: [0, Math.cos(i * 60 * Math.PI / 180) * 30],
+              y: [0, Math.sin(i * 60 * Math.PI / 180) * 30],
+              opacity: [0, 1, 0],
+              scale: [0, 1.5, 0]
+            }}
+            transition={{
+              duration: 2,
+              repeat: Infinity,
+              delay: i * 0.1,
+              ease: "easeInOut"
+            }}
+          />
+        ))}
       </motion.button>
       
       {isOpen && (
         <motion.div
-          initial={{ opacity: 0, y: -20, scale: 0.8 }}
-          animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: -20, scale: 0.8 }}
-          className="absolute top-16 right-0 bg-white/10 backdrop-blur-xl rounded-2xl p-4 shadow-2xl border border-white/20"
+          initial={{ opacity: 0, y: -30, scale: 0.8, rotateX: -15 }}
+          animate={{ opacity: 1, y: 0, scale: 1, rotateX: 0 }}
+          exit={{ opacity: 0, y: -30, scale: 0.8, rotateX: -15 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="absolute top-20 right-0 bg-black/30 backdrop-blur-2xl rounded-3xl p-6 shadow-2xl border border-white/10"
+          style={{ 
+            background: `linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(255,255,255,0.1) 100%)`,
+            boxShadow: `0 25px 50px -12px ${currentTheme.secondary}40, inset 0 1px 0 rgba(255,255,255,0.1)`
+          }}
         >
-          <div className="grid grid-cols-2 gap-3">
-            {themes.map((theme) => (
+          {/* Header */}
+          <div className="text-center mb-4">
+            <h3 className="text-white font-bold text-sm mb-1">Choose Theme</h3>
+            <div className="w-12 h-0.5 bg-gradient-to-r mx-auto rounded-full"
+                 style={{ backgroundImage: `linear-gradient(90deg, ${currentTheme.secondary}, ${currentTheme.tertiary})` }}
+            />
+          </div>
+          
+          <div className="grid grid-cols-2 gap-4">
+            {themes.map((theme, index) => (
               <motion.button
                 key={theme.name}
-                whileHover={{ scale: 1.05 }}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1 }}
+                whileHover={{ scale: 1.08, y: -4 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => {
                   onColorChange(theme);
                   setIsOpen(false);
                 }}
-                className="relative w-16 h-12 rounded-xl overflow-hidden shadow-lg"
+                className="relative w-20 h-16 rounded-2xl overflow-hidden shadow-xl group"
                 style={{ 
-                  background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 50%, ${theme.tertiary} 100%)`
+                  background: `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary} 40%, ${theme.tertiary} 100%)`,
+                  boxShadow: `0 8px 25px ${theme.secondary}30`
                 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-transparent via-white/10 to-transparent"></div>
-                <div className="absolute bottom-1 left-1 right-1 text-[8px] text-white/80 text-center font-medium">
-                  {theme.name}
+                {/* Shimmer effect */}
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full"
+                  whileHover={{ translateX: '200%' }}
+                  transition={{ duration: 0.6 }}
+                />
+                
+                {/* Inner glow */}
+                <div 
+                  className="absolute inset-0.5 rounded-xl opacity-60"
+                  style={{ 
+                    background: `radial-gradient(circle at 30% 30%, ${theme.secondary}40, transparent 70%)`
+                  }}
+                />
+                
+                {/* Theme name */}
+                <div className="absolute bottom-1.5 left-0 right-0 text-center">
+                  <span className="text-[10px] text-white/90 font-semibold tracking-wide drop-shadow-lg">
+                    {theme.name}
+                  </span>
                 </div>
+                
+                {/* Active indicator */}
+                {currentTheme.name === theme.name && (
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    className="absolute top-1 right-1 w-3 h-3 rounded-full bg-white shadow-lg"
+                  >
+                    <div className="absolute inset-0.5 rounded-full bg-green-400"></div>
+                  </motion.div>
+                )}
               </motion.button>
             ))}
+          </div>
+          
+          {/* Footer */}
+          <div className="mt-4 text-center">
+            <span className="text-white/60 text-xs">Tap to switch themes instantly</span>
           </div>
         </motion.div>
       )}
